@@ -20,6 +20,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           itemBuilder: (context, index) {
             return MovieWidget(
               isFavorite: true,
+              movie: null,
             );
           }),
     );
