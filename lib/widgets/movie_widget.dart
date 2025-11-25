@@ -3,6 +3,8 @@ import 'package:mvvm_statemanagments/models/movie_search_list.dart';
 import 'package:mvvm_statemanagments/screens/movies_details.dart';
 import 'package:mvvm_statemanagments/services/init_getit.dart';
 import 'package:mvvm_statemanagments/services/navigation_servicer.dart';
+import 'package:mvvm_statemanagments/view_models/favorites_provider.dart';
+import 'package:provider/provider.dart';
 
 import '../constants/my_app_colors.dart';
 import '../constants/my_app_icons.dart';
@@ -11,19 +13,19 @@ import 'favorite_widget.dart';
 import 'genres_list_widget.dart';
 
 class MovieWidget extends StatelessWidget {
-  const MovieWidget({super.key, required this.isFavorite, required this.movie});
-  final bool isFavorite;
-  final Search? movie;
+  const MovieWidget({super.key});
+  // final Search? movie;
 
   @override
   Widget build(BuildContext context) {
+    final movie = Provider.of<Search>(context);
     return Card(
       elevation: 5,
       margin: const EdgeInsets.all(8.0),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: InkWell(
         onTap: () {
-          getIt<NavigationService>().navigateTo(MoviesDetails());
+          getIt<NavigationService>().navigateTo(MoviesDetails(movie: movie));
         },
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -36,7 +38,7 @@ class MovieWidget extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: CachedImage(
-                    imageUrl: movie?.poster,
+                    imageUrl: movie.poster,
                     height: 100,
                     width: 60,
                     fit: BoxFit.cover,
@@ -48,7 +50,7 @@ class MovieWidget extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        movie?.title ?? "",
+                        movie.title ?? "",
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -66,11 +68,7 @@ class MovieWidget extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 4),
-                      GenresListWidget(
-                        genres: [
-                          movie?.type ?? ""
-                        ],
-                      ),
+                      GenresListWidget(genres: [movie.type ?? ""]),
                       Row(
                         children: [
                           const Icon(
@@ -79,9 +77,19 @@ class MovieWidget extends StatelessWidget {
                             size: 20,
                           ),
                           const SizedBox(width: 8),
-                          Text(movie?.year ?? "NA"),
+                          Text(movie.year ?? "NA"),
                           const Spacer(),
-                          FavoriteWidget(isFavorite: isFavorite, onPressed: () {}),
+                          Consumer(
+                            builder:
+                                (context, FavoritesProvider favoriteProvider, child,) {
+                                  return FavoriteWidget(
+                                    isFavorite: favoriteProvider.isFavorite(movie,),
+                                    onPressed: () {
+                                      favoriteProvider.toggleFavorite(movie);
+                                    },
+                                  );
+                                },
+                          ),
                         ],
                       ),
                     ],

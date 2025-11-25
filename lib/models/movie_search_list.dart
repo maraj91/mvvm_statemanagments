@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+
 class MovieSearchList {
   MovieSearchList({
     List<Search>? search,
@@ -51,7 +53,7 @@ class MovieSearchList {
   }
 }
 
-class Search {
+class Search with ChangeNotifier{
   Search({
     String? title,
     String? year,
