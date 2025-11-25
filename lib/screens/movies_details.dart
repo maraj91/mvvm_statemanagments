@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mvvm_statemanagments/constants/my_app_colors.dart';
 import 'package:mvvm_statemanagments/constants/my_app_icons.dart';
+import 'package:mvvm_statemanagments/models/movie_details_model.dart';
+import 'package:mvvm_statemanagments/repository/movies_repository.dart';
 import 'package:mvvm_statemanagments/services/navigation_servicer.dart';
 import 'package:mvvm_statemanagments/widgets/cached_image.dart';
 import 'package:mvvm_statemanagments/widgets/genres_list_widget.dart';
@@ -9,8 +11,45 @@ import '../services/init_getit.dart';
 import '../widgets/favorite_widget.dart';
 import '../widgets/movie_widget.dart';
 
-class MoviesDetails extends StatelessWidget {
-  const MoviesDetails({super.key});
+class MoviesDetails extends StatefulWidget {
+  const MoviesDetails({super.key, required this.id});
+  final String id;
+
+  @override
+  State<MoviesDetails> createState() => _MoviesDetailsState();
+}
+
+class _MoviesDetailsState extends State<MoviesDetails> {
+  var _isLoading = false;
+  var _movieDetails = MovieDetailsModel();
+
+  @override
+  void initState() {
+    _fetchMovieDetails();
+    super.initState();
+  }
+
+  Future<void> _fetchMovieDetails() async {
+    if (_isLoading) return;
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      final result = await getIt<MoviesRepository>().fetchMovieDetails(
+        id: widget.id,
+      );
+      if (mounted) {
+        setState(() {
+          _movieDetails = result;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      getIt<NavigationService>().showSnackbar(
+        "Failed to fetch movie details $e",
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,15 +57,22 @@ class MoviesDetails extends StatelessWidget {
       body: SafeArea(
         child: Stack(
           children: [
-            SizedBox(
-              height: MediaQuery.sizeOf(context).height * 0.45,
-              width: double.infinity,
-              child: CachedImage(
-                imageUrl:
-                    'https://m.media-amazon.com/images/I/81dae9nZFBS._AC_UF894,1000_QL80_.jpg',
-                height: 100,
-                width: 60,
-                fit: BoxFit.cover,
+            if(_isLoading)
+              const Center(
+                child: CircularProgressIndicator.adaptive(),
+              ),
+            if(!_isLoading)
+            Hero(
+              tag: widget.id,
+              child: SizedBox(
+                height: MediaQuery.sizeOf(context).height * 0.45,
+                width: double.infinity,
+                child: CachedImage(
+                  imageUrl: _movieDetails.poster ?? "",
+                  height: 100,
+                  width: 60,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
             SingleChildScrollView(
@@ -47,25 +93,25 @@ class MoviesDetails extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const SizedBox(height: 25),
-                                const Text(
-                                  'Movie Name',
+                                Text(
+                                  _movieDetails.title ?? "",
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 const SizedBox(height: 8),
-                                const Row(
+                                Row(
                                   children: [
                                     Icon(
                                       MyAppIcons.star,
                                       color: MyAppColors.startColor,
                                       size: 20,
                                     ),
-                                    Text('4.5'),
+                                    Text(_movieDetails.imdbRating ?? ""),
                                     Spacer(),
                                     Text(
-                                      "Release date",
+                                      _movieDetails.released ?? "",
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.normal,
@@ -74,22 +120,126 @@ class MoviesDetails extends StatelessWidget {
                                   ],
                                 ),
                                 const SizedBox(height: 8),
-                                const GenresListWidget(
-                                  genres: [
-                                    "Action",
-                                    "Comedy",
-                                    "Drama",
+                                GenresListWidget(
+                                  genres: _movieDetails.genre?.split(",")  ?? [
+                                    "NA"
+                                  ]
+                                  ,
+                                ),
+                                const SizedBox(height: 15),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Director: ",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      _movieDetails.director ?? "",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 15),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Writer: ",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      _movieDetails.writer ?? "",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    ),
                                   ],
                                 ),
                                 const SizedBox(height: 15),
                                 Text(
-                                  'Overview ' * 100,
+                                  _movieDetails.plot ?? "",
                                   textAlign: TextAlign.justify,
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
+                                const SizedBox(height: 15),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Actors: ",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        _movieDetails.actors ?? "",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.normal,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 15),
+                                Row(
+                                  children: [
+                                    Text(
+                                      "Language: ",
+                                      textAlign: TextAlign.justify,
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    GenresListWidget(
+                                      genres: _movieDetails.language?.split(",")  ?? [
+                                        "NA"
+                                      ]
+                                      ,
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 15),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Awards: ",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        _movieDetails.awards ?? "",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.normal,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )
                               ],
                             ),
                           ),

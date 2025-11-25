@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:mvvm_statemanagments/screens/favorites_screen.dart';
-import 'package:mvvm_statemanagments/screens/movies_details.dart';
 import 'package:mvvm_statemanagments/screens/movies_screen.dart';
-import 'package:mvvm_statemanagments/screens/splash_screen.dart';
 import 'package:mvvm_statemanagments/services/init_getit.dart';
 import 'package:mvvm_statemanagments/services/navigation_servicer.dart';
-import 'package:mvvm_statemanagments/widgets/my_error_widget.dart';
 
 import 'constants/my_theme_data.dart';
 

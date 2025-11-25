@@ -23,7 +23,7 @@ class MovieWidget extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: InkWell(
         onTap: () {
-          getIt<NavigationService>().navigateTo(MoviesDetails());
+          getIt<NavigationService>().navigateTo(MoviesDetails(id: movie?.imdbID ?? ""));
         },
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -33,13 +33,16 @@ class MovieWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               mainAxisSize: MainAxisSize.max,
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: CachedImage(
-                    imageUrl: movie?.poster,
-                    height: 100,
-                    width: 60,
-                    fit: BoxFit.cover,
+                Hero(
+                  tag: movie?.imdbID ?? "tag",
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: CachedImage(
+                      imageUrl: movie?.poster,
+                      height: 100,
+                      width: 60,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 16),
