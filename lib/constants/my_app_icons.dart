@@ -9,4 +9,5 @@ class MyAppIcons {
   static const IconData star = Icons.star;
   static const IconData date = Icons.access_alarm_rounded;
   static const IconData delete = Icons.delete_forever;
+  static const IconData arrowBack = Icons.arrow_back;
 }
