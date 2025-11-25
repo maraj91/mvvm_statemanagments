@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mvvm_statemanagments/models/movie_search_list.dart';
 import 'package:mvvm_statemanagments/screens/movies_details.dart';
 import 'package:mvvm_statemanagments/services/init_getit.dart';
 import 'package:mvvm_statemanagments/services/navigation_servicer.dart';
@@ -10,8 +11,9 @@ import 'favorite_widget.dart';
 import 'genres_list_widget.dart';
 
 class MovieWidget extends StatelessWidget {
-  const MovieWidget({super.key, required this.isFavorite});
+  const MovieWidget({super.key, required this.isFavorite, required this.movie});
   final bool isFavorite;
+  final Search? movie;
 
   @override
   Widget build(BuildContext context) {
@@ -34,8 +36,7 @@ class MovieWidget extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(10),
                   child: CachedImage(
-                    imageUrl:
-                        'https://m.media-amazon.com/images/I/81dae9nZFBS._AC_UF894,1000_QL80_.jpg',
+                    imageUrl: movie?.poster,
                     height: 100,
                     width: 60,
                     fit: BoxFit.cover,
@@ -46,8 +47,8 @@ class MovieWidget extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Movie Name',
+                      Text(
+                        movie?.title ?? "",
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -61,11 +62,15 @@ class MovieWidget extends StatelessWidget {
                             color: MyAppColors.startColor,
                             size: 20,
                           ),
-                          Text('4.5'),
+                          Text('NA'),
                         ],
                       ),
                       const SizedBox(height: 4),
-                      const GenresListWidget(),
+                      GenresListWidget(
+                        genres: [
+                          movie?.type ?? ""
+                        ],
+                      ),
                       Row(
                         children: [
                           const Icon(
@@ -74,7 +79,7 @@ class MovieWidget extends StatelessWidget {
                             size: 20,
                           ),
                           const SizedBox(width: 8),
-                          const Text('Release date'),
+                          Text(movie?.year ?? "NA"),
                           const Spacer(),
                           FavoriteWidget(isFavorite: isFavorite, onPressed: () {}),
                         ],

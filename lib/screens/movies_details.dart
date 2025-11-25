@@ -74,7 +74,13 @@ class MoviesDetails extends StatelessWidget {
                                   ],
                                 ),
                                 const SizedBox(height: 8),
-                                const GenresListWidget(),
+                                const GenresListWidget(
+                                  genres: [
+                                    "Action",
+                                    "Comedy",
+                                    "Drama",
+                                  ],
+                                ),
                                 const SizedBox(height: 15),
                                 Text(
                                   'Overview ' * 100,

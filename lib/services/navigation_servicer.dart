@@ -34,9 +34,9 @@ class NavigationService {
     );
   }
 
-  void showSnackbar() {
+  void showSnackbar(String message) {
     ScaffoldMessenger.of(navigatorKey.currentContext!).hideCurrentMaterialBanner();
-    final snackbarWidget = SnackBar(content: Text('Hello', style: TextStyle(color: Colors.white),));
+    final snackbarWidget = SnackBar(content: Text(message, style: TextStyle(color: Colors.white),));
     ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(snackbarWidget);
   }
 }

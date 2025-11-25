@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 class GenresListWidget extends StatefulWidget {
-  const GenresListWidget({super.key});
+  const GenresListWidget({super.key, required this.genres});
+
+  final List<String> genres;
 
   @override
   State<GenresListWidget> createState() => _GenresListWidgetState();
@@ -11,7 +13,10 @@ class _GenresListWidgetState extends State<GenresListWidget> {
   @override
   Widget build(BuildContext context) {
     return Wrap(
-      children: List.generate(5, (index) => chipWidget('Genre $index', context)),
+      children: List.generate(
+        widget.genres.length,
+        (index) => chipWidget(widget.genres[index], context),
+      ),
     );
   }
 }
